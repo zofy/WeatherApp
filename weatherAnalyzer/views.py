@@ -2,8 +2,18 @@ from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpRe
 from django.shortcuts import render
 import pygeoip
 
-from weatherAnalyzer.forms import LoginForm
+from weatherAnalyzer.forms import LoginForm, SignUpForm
 from ipware.ip import get_real_ip, get_ip
+
+
+def sign_up(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+    elif request.method == 'GET':
+        form = SignUpForm()
+
+    return render(request, 'weatherAnalyzer/login.html',
+                  {'form': form, 'url': 'weatherAnalyzer:signUp', 'button': 'Sign Up'})
 
 
 def login(request):
@@ -23,4 +33,5 @@ def login(request):
 
     if request.method == 'GET':
         form = LoginForm()
-    return render(request, 'weatherAnalyzer/login.html', {'form': form})
+    return render(request, 'weatherAnalyzer/login.html',
+                  {'form': form, 'url': 'weatherAnalyzer:login', 'button': 'Login'})

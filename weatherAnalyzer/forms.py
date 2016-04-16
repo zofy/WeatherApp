@@ -29,15 +29,17 @@ class LoginForm(ModelForm):
             return None
 
 
-class RegisterForm(forms.Form):
+class SignUpForm(LoginForm):
     confirmEmail = forms.EmailField(label='Confirm email',
                                     widget=forms.EmailInput(attrs={'placeholder': 'confirm email'}))
-    password = forms.CharField(label='Password',
-                               widget=forms.PasswordInput(attrs={'placeholder': 'password'}),
-                               max_length=15,
-                               min_length=6)
 
     confirmPassword = forms.CharField(label='Confirm password',
                                       widget=forms.PasswordInput(attrs={'placeholder': 'password'}),
                                       max_length=15,
                                       min_length=6)
+
+    class Meta(LoginForm.Meta):
+        fields = ['email', 'confirmEmail', 'password', 'confirmPassword']
+
+    def clean(self):
+        return self.cleaned_data
