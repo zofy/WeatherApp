@@ -1,0 +1,17 @@
+body {
+    /*background-image: url("login.jpg");*/
+}
+
+h1 {
+    text-align: center;
+}
+
+.container {
+    margin: 20px auto;
+    width: 20%;
+}
+
+button {
+    text-align: center;
+    margin: 5px 37%;
+}
