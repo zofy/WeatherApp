@@ -5,8 +5,9 @@ from django.db import models
 
 
 class UserManager(models.Manager):
-    def create_user(self, email, password):
+    def create_user(self, email, password, location):
         user = User(email=email, password=password)
+        Location.objects.create_location(user=user, location=location)
         user.save()
         return user
 
@@ -23,6 +24,12 @@ class User(models.Model):
 
 
 class LocationManager(models.Manager):
+    def create_location(self, user, location):
+        l = Location(user=user, latitude=location.get('latitude'), longitude=location.get('longitude'),
+                     city=location.get('city'))
+        l.save()
+        return l
+
     def change_location(self):
         pass
 
