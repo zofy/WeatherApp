@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 import pygeoip
@@ -30,15 +31,18 @@ def login(request):
         form = LoginForm(request.POST)
         if form.is_valid():
             user = form.authenticate()
-            location = get_users_location(request)
+            if user is not None:
+                location = get_users_location(request)
 
-            a = Analyzer(str(location.get('latitude')), str(location.get('longitude')))
-            url = a.build_url()
-            w_data = a.get_data()
-            m = MailManager('zofy11@gmail.com', str(w_data))
-            m.login_to_server()
-            m.send_forecast()
-            return HttpResponse(url)
+                a = Analyzer(str(location.get('latitude')), str(location.get('longitude')))
+                url = a.build_url()
+                w_data = a.get_data()
+                m = MailManager('zofy11@gmail.com', str(w_data))
+                m.login_to_server()
+                m.send_forecast()
+                return HttpResponse(url)
+            else:
+                messages.error(request, 'Invalid input, try again!')
 
     if request.method == 'GET':
         form = LoginForm()

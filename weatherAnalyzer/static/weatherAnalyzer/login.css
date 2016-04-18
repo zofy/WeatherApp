@@ -15,3 +15,27 @@ button {
     text-align: center;
     margin: 5px 37%;
 }
+
+form label, input {
+    display: block;
+    margin: 5px auto;
+}
+
+.form-actions {
+    margin: 0;
+    text-align: center;
+}
+
+.control-label {
+    text-align: left;
+    margin: 15px 38px auto;
+    width: 70%;
+}
+
+#msg {
+    text-align: center;
+    color: #D8000C;
+    background-color: #FFBABA;
+    padding: 15px 15px;
+    border-radius: 6%;
+}
