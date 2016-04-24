@@ -7,8 +7,8 @@ from django.db import models
 class UserManager(models.Manager):
     def create_user(self, email, password, location):
         user = User(email=email, password=password)
-        Location.objects.create_location(user=user, location=location)
         user.save()
+        Location.objects.create_location(user=user, location=location)
         return user
 
 
@@ -25,13 +25,18 @@ class User(models.Model):
 
 class LocationManager(models.Manager):
     def create_location(self, user, location):
-        l = Location(user=user, latitude=location.get('latitude'), longitude=location.get('longitude'),
+        l = Location(user=user, latitude=location.get('lat'), longitude=location.get('lng'),
                      city=location.get('city'))
         l.save()
         return l
 
-    def change_location(self):
-        pass
+    def change_location(self, user, loc):
+        db_location = Location.objects.get(user=user)
+        for data in loc:
+            if loc[data] != db_location.loc_dict[data]:
+                db_location.loc_dict[data] = loc[data]
+        db_location.save()
+        return db_location.loc_dict
 
 
 class Location(models.Model):
@@ -39,9 +44,10 @@ class Location(models.Model):
     latitude = models.CharField(max_length=10, default='0')
     longitude = models.CharField(max_length=10, default='0')
     city = models.CharField(max_length=20, default=None)
-    country = models.CharField(max_length=20, default=None)
+    # country = models.CharField(max_length=20, default=None)
+    loc_dict = {'lat': latitude, 'lng': longitude, 'city': city}
 
     objects = LocationManager()
 
     def __str__(self):
-        return 'Email: ' + self.user.email + ' location: ' + self.latitude + ', ' + self.longitude + ', ' + self.city + ', ' + self.country
+        return 'Email: ' + self.user.email + ' location: ' + self.latitude + ', ' + self.longitude + ', ' + self.city

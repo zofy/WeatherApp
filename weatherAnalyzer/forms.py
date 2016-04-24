@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 from django import forms
 
@@ -24,7 +25,7 @@ class LoginForm(ModelForm):
         mail = self.cleaned_data.get('email')
         password = self.cleaned_data.get('password')
         try:
-            return User.objects.get(name=mail, password=password)
+            return User.objects.get(email=mail, password=password)
         except:
             return None
 
@@ -42,6 +43,8 @@ class SignUpForm(LoginForm):
         fields = ['email', 'confirmEmail', 'password', 'confirmPassword']
 
     def clean(self):
+        if not self.check_emails() or not self.check_passwords():
+            raise ValidationError('Emails and passwords must match!')
         return self.cleaned_data
 
     def check_emails(self):

@@ -5,9 +5,9 @@ import pygeoip
 
 from weatherAnalyzer.analyzer import Analyzer
 from weatherAnalyzer.forms import LoginForm, SignUpForm
-from ipware.ip import get_real_ip, get_ip
+import geocoder
 
-from weatherAnalyzer.models import User
+from weatherAnalyzer.models import User, Location
 from weatherAnalyzer.sender import MailManager
 
 
@@ -19,6 +19,9 @@ def sign_up(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             User.objects.create_user(email=email, password=password, location=location)
+            messages.info(request, 'Thanks for signing in!')
+            messages.info(request, 'Now you can login.')
+            return HttpResponseRedirect('/mbForecast/login/')
     elif request.method == 'GET':
         form = SignUpForm()
 
@@ -33,14 +36,8 @@ def login(request):
             user = form.authenticate()
             if user is not None:
                 location = get_users_location(request)
-
-                a = Analyzer(str(location.get('latitude')), str(location.get('longitude')))
-                url = a.build_url()
-                w_data = a.get_data()
-                m = MailManager('zofy11@gmail.com', str(w_data))
-                m.login_to_server()
-                m.send_forecast()
-                return HttpResponse(url)
+                data = check_users_location(user, location)
+                return HttpResponse(str(data['lat']) + ', ' + str(data['lng']) + ', ' + data['city'])
             else:
                 messages.error(request, 'Invalid input, try again!')
 
@@ -56,9 +53,17 @@ def get_users_location(request):
         ip = x_forwarded.split(',')[0]
     else:
         ip = request.META.get('REMOTE_ADDR')
-    # ip = '78.141.68.228'
-    gi = pygeoip.GeoIP('GeoLiteCity.dat', pygeoip.MEMORY_CACHE)
-    return gi.record_by_addr(ip)
+    ip = '78.141.101.59'
+    gi = geocoder.freegeoip(ip)
+    return gi.json
+
+
+def check_users_location(user, location):
+    loc = {'lat': None, 'lng': None, 'city': None}
+    for data in loc:
+        if location.get(data) is not None:
+            loc[data] = location[data]
+    return Location.objects.change_location(user, loc)
 
 
 def save_user_location(location):
