@@ -20,4 +20,6 @@ def send_forecast():
         w_data = a.get_data()
         m = MailManager(str(email), str(w_data))
         m.login_to_server()
-        m.send_forecast()
+        m.send_mail()
+
+

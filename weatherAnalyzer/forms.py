@@ -43,6 +43,9 @@ class SignUpForm(LoginForm):
         fields = ['email', 'confirmEmail', 'password', 'confirmPassword']
 
     def clean(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('Account with this email already exists!')
         if not self.check_emails() or not self.check_passwords():
             raise ValidationError('Emails and passwords must match!')
         return self.cleaned_data

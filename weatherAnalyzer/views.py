@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
-import pygeoip
 
 from weatherAnalyzer.analyzer import Analyzer
 from weatherAnalyzer.forms import LoginForm, SignUpForm
@@ -18,7 +17,8 @@ def sign_up(request):
             location = get_users_location(request)
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            User.objects.create_user(email=email, password=password, location=location)
+            user = User.objects.create_user(email=email, password=password, location=location)
+            send_welcome_mail(user)
             messages.info(request, 'Thanks for signing in!')
             messages.info(request, 'Now you can login.')
             return HttpResponseRedirect('/mbForecast/login/')
@@ -36,8 +36,14 @@ def login(request):
             user = form.authenticate()
             if user is not None:
                 location = get_users_location(request)
-                data = check_users_location(user, location)
-                return HttpResponse(str(data['lat']) + ', ' + str(data['lng']) + ', ' + data['city'])
+                check_users_location(user, location)
+
+                a = Analyzer(location)
+                data = a.get_data()
+                result = {'sunrise': data['forecast'][1]['sunrise_time'], 'sunset': data['forecast'][1]['sunset_time'],
+                          'min': data['forecast'][1]['temperature_min'],
+                          'max': data['forecast'][1]['temperature_max']}
+                return JsonResponse(result)
             else:
                 messages.error(request, 'Invalid input, try again!')
 
@@ -63,8 +69,12 @@ def check_users_location(user, location):
     for data in loc:
         if location.get(data) is not None:
             loc[data] = location[data]
-    return Location.objects.change_location(user, loc)
+    Location.objects.change_location(user, loc)
 
 
-def save_user_location(location):
-    pass
+def send_welcome_mail(user):
+    message = 'Thanks for your interest in our app\n\nYour email: %s\nYour password: %s' % (
+    str(user.email), str(user.password))
+    m = MailManager(str(user.email), message)
+    m.login_to_server()
+    m.send_mail()
