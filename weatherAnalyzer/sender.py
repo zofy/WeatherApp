@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 class MailManager(object):
     from_address = 'mbforecast@gmail.com'
     username = 'mbforecast'
-    password = 'xxxxxxxxx'
+    password = 'xxxxxxxx'
 
     def __init__(self, to_address, text=''):
         self.to_address = to_address

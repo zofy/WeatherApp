@@ -18,8 +18,18 @@ def send_forecast():
         location = Location.objects.get(user=user)
         a = Analyzer(location.loc_dict)
         w_data = a.get_data()
-        m = MailManager(str(email), str(w_data))
+        forecast = create_message(w_data)
+        m = MailManager(str(email), forecast)
         m.login_to_server()
         m.send_mail()
 
 
+def create_message(data):
+    result = {'sunrise': data['forecast'][1]['sunrise_time'], 'sunset': data['forecast'][1]['sunset_time'],
+              'min': data['forecast'][1]['temperature_min'],
+              'max': data['forecast'][1]['temperature_max'],
+              'wind': data['forecast'][1]['wind_gust_max'],
+              'wind_gust': data['forecast'][1]['wind_speed_max'],}
+    message = 'Weather for tommorow\nSunrise: %s am, Sunset: %s pm\nMin: %s°C, Max: %s°C\nWind: %s km/h' % (
+        result['sunrise'], result['sunset'], result['min'], result['max'], result['wind'])
+    return message
