@@ -40,9 +40,10 @@ def login(request):
 
                 a = Analyzer(location)
                 data = a.get_data()
-                result = {'sunrise': data['forecast'][1]['sunrise_time'], 'sunset': data['forecast'][1]['sunset_time'],
+                result = {'date': data['forecast'][1]['date'],'sunrise': data['forecast'][1]['sunrise_time'], 'sunset': data['forecast'][1]['sunset_time'],
                           'min': data['forecast'][1]['temperature_min'],
                           'max': data['forecast'][1]['temperature_max']}
+                # return HttpResponse(a.build_url())
                 return JsonResponse(result)
             else:
                 messages.error(request, 'Invalid input, try again!')

@@ -33,21 +33,23 @@ class LocationManager(models.Manager):
     def change_location(self, user, loc):
         db_location = Location.objects.get(user=user)
         for data in loc:
-            if loc[data] != db_location.loc_dict[data]:
-                db_location.loc_dict[data] = loc[data]
+            if loc[data] != getattr(db_location, data):
+                setattr(db_location, data, loc[data])
         db_location.save()
-        return db_location.loc_dict
+        return db_location
 
 
 class Location(models.Model):
     user = models.OneToOneField(User)
-    latitude = models.CharField(max_length=10, default='0')
-    longitude = models.CharField(max_length=10, default='0')
+    lat = models.CharField(max_length=10, default='0')
+    lng = models.CharField(max_length=10, default='0')
     city = models.CharField(max_length=20, default=None)
     # country = models.CharField(max_length=20, default=None)
-    loc_dict = {'lat': latitude, 'lng': longitude, 'city': city}
+
+    def get_dict(self):
+        return {'lat': self.lat, 'lng': self.lng, 'city': self.city}
 
     objects = LocationManager()
 
     def __str__(self):
-        return 'Email: ' + self.user.email + ' location: ' + self.latitude + ', ' + self.longitude + ', ' + self.city
+        return 'Email: ' + self.user.email + ' location: ' + self.lat + ', ' + self.lng + ', ' + self.city

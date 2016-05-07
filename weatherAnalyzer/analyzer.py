@@ -27,10 +27,10 @@ from sender import MailManager
 class Analyzer(object):
     base = 'http://my.meteoblue.com/feed/json_7day_3h_firstday?apikey=sk489ywfh498hjf'
 
-    def __init__(self, location):
-        self.lat = location.get('lat')
-        self.long = location.get('lng')
-        self.city = location.get('city')
+    def __init__(self, loc_dict):
+        self.lat = loc_dict.get('lat')
+        self.long = loc_dict.get('lng')
+        self.city = loc_dict.get('city')
 
     def __str__(self):
         return 'Getting data for {lat: %s, long: %s, city: %s}' % (self.lat, self.long, self.city)

@@ -11,12 +11,12 @@ logger = get_task_logger(__name__)
 
 @periodic_task(run_every=(crontab(minute='*/1')), name="send_forecast", ignore_result=True)
 def send_forecast():
-    logger.info("Sending forecast to ...")
+    logger.info("Sending forecast to all users...")
     users = User.objects.all()
     for user in users:
         email = user.email
         location = Location.objects.get(user=user)
-        a = Analyzer(location.loc_dict)
+        a = Analyzer(location.get_dict())
         w_data = a.get_data()
         forecast = create_message(w_data)
         m = MailManager(str(email), forecast)
@@ -30,6 +30,6 @@ def create_message(data):
               'max': data['forecast'][1]['temperature_max'],
               'wind': data['forecast'][1]['wind_gust_max'],
               'wind_gust': data['forecast'][1]['wind_speed_max'],}
-    message = 'Weather for tommorow\nSunrise: %s am, Sunset: %s pm\nMin: %s°C, Max: %s°C\nWind: %s km/h' % (
+    message = 'Weather for tommorow\nSunrise: %s am, Sunset: %s pm\nMin: %s C, Max: %s C\nWind: %s km/h' % (
         result['sunrise'], result['sunset'], result['min'], result['max'], result['wind'])
     return message
