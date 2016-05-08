@@ -9,9 +9,9 @@
     <title>Login</title>
 </head>
 <body>
-<h1>Lets do it:</h1>
+{#<h1>Lets do it:</h1>#}
     <div class="container">
-
+        <h1>Lets do it:</h1>
         <form action={% url url %} method="POST">
             {% csrf_token %}
             {{ form|bootstrap }}
